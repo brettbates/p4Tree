@@ -36,6 +36,8 @@ class Node(object):
             return identifier
         elif isinstance(identifier, int):
             return identifier
+        elif isinstance(identifier, unicode):
+            return str(identifier)
         else:
             raise NodeIDTypeException("Only string and integer types are supported currently")
 
