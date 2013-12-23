@@ -9,7 +9,7 @@ class NodeIDAbsentError(Exception):
 
 class MultipleRootError(Exception):
     pass
-    
+
 class DuplicatedNodeIdError(Exception):
     pass
 
@@ -123,7 +123,7 @@ class Tree(object):
         """
         if not isinstance(node, Node):
             raise OSError("First parameter must be object of Class::Node.")
-            
+
         if node.identifier in self._nodes:
             raise DuplicatedNodeIdError("Can't create node with ID '%s'" % node.identifier)
 
@@ -140,12 +140,12 @@ class Tree(object):
         self.__update_bpointer(node.identifier, parent)
 
 
-    def create_node(self, tag=None, identifier=None, parent=None):
+    def create_node(self, tag=None, identifier=None, parent=None, access=None):
         """
         Create a child node for the node indicated by the 'parent' parameter.
         """
         node = Node(tag, identifier)
-        self.add_node(node, parent)
+        self.add_node(node, parent, access)
         return node
 
 
@@ -222,7 +222,7 @@ class Tree(object):
 
         set_joint = set(new_tree._nodes) & set(self._nodes) # joint keys
         if set_joint:
-            # TODO: a deprecated routine is needed to avoid exception 
+            # TODO: a deprecated routine is needed to avoid exception
             raise ValueError('Duplicated nodes %s exists.' % list(set_joint))
 
         if deepcopy:

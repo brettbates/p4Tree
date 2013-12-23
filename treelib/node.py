@@ -19,6 +19,7 @@ class Node(object):
         self.expanded = expanded
         self._bpointer = None
         self._fpointer = list()
+        self.access = None
 
 
     def _set_identifier(self, identifier):
