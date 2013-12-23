@@ -7,7 +7,7 @@
 
 __author__ = 'holger'
 
-from treelib import tree
+from p4treelib import tree
 
 import fnmatch
 import os

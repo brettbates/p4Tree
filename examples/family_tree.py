@@ -5,7 +5,7 @@
 #
 __author__ = 'chenxm'
 
-from treelib import Tree, Node
+from p4treelib import Tree, Node
 
 ## Create the family tree
 tree = Tree()
