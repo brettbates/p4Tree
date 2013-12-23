@@ -13,6 +13,8 @@ class MultipleRootError(Exception):
 class DuplicatedNodeIdError(Exception):
     pass
 
+class LinkPastRootNodeError(Exception):
+    pass
 
 class Tree(object):
 
@@ -124,9 +126,13 @@ class Tree(object):
         """
         Delete leaves that have 0 access
         """
+        changed = False
         for node in self.expand_tree(root):
             if self[node].is_leaf() and self[node].access.binary == 0:
                 self.remove_node(node)
+                changed = True
+
+        return changed
 
 
     def link_past_node(self, nid):
@@ -135,6 +141,8 @@ class Tree(object):
         For example, if we have a -> b -> c
         and delete node b, we are left with a -> c
         """
+        if self.root == nid:
+            raise LinkPastRootNodeError("Cannot link past the root node, delete it with remove_node()")
         #Get the parent of the node we are linking past
         parent = self[self[nid].bpointer]
         #Set the children of the node to the parent
@@ -144,7 +152,6 @@ class Tree(object):
         parent.fpointer += self[nid].fpointer
         #Delete the node
         parent.update_fpointer(nid, mode=parent.DELETE)
-
 
     def add_node(self, node, parent=None):
         """
