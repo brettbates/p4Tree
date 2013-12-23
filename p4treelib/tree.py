@@ -113,8 +113,11 @@ class Tree(object):
         """
         Get leaves of the whole tree of a subtree.
         """
-        pass
-
+        leaves = []
+        for node in self.expand_tree(root):
+            if self[node].is_leaf():
+                leaves.append(node)
+        return leaves
 
     def add_node(self, node, parent=None):
         """
@@ -286,7 +289,7 @@ class Tree(object):
         nid = self.root if (nid is None) else nid
         if not self.contains(nid):
             raise NodeIDAbsentError
-        
+
         if self[nid].access:
             label = ("{0}".format(self[nid].tag)) if idhidden else ("{0}[{1}] Access:{2}".format(self[nid].tag, self[nid].identifier, self[nid].access.access))
         else:
