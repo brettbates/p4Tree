@@ -4,12 +4,12 @@ from setuptools import setup
 from treelib import __version__
 
 setup(
-    name = "treelib",
+    name = "p4treelib",
     version = __version__,
     url = 'https://github.com/caesar0301/pyTree',
     author = 'caesar0301',
     author_email = 'chenxm35@gmail.com',
-    description = 'A Python 2/3 implementation of tree structure.',
+    description = 'pyTree with added access level. Based completely off of: https://github.com/caesar0301/pyTree, all credit goes to the creator',
     long_description='''This is a simple tree data structure implementation in python.''',
     license = "LICENSE",
     packages = ['treelib'],
