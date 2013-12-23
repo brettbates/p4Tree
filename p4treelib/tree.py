@@ -286,7 +286,11 @@ class Tree(object):
         nid = self.root if (nid is None) else nid
         if not self.contains(nid):
             raise NodeIDAbsentError
-        label = ("{0}".format(self[nid].tag)) if idhidden else ("{0}[{1}]".format(self[nid].tag, self[nid].identifier))
+        
+        if self[nid].access:
+            label = ("{0}".format(self[nid].tag)) if idhidden else ("{0}[{1}] Access:{2}".format(self[nid].tag, self[nid].identifier, self[nid].access.access))
+        else:
+            label = ("{0}".format(self[nid].tag)) if idhidden else ("{0}[{1}]".format(self[nid].tag, self[nid].identifier))
         filter = (self._real_true) if (filter is None) else filter
 
         if level == self.ROOT:
@@ -335,7 +339,10 @@ class Tree(object):
         if not self.contains(nid):
             raise NodeIDAbsentError("Node '%s' is not in the tree" % nid)
 
-        label = ("{0}".format(self[nid].tag)) if idhidden else ("{0}[{1}]".format(self[nid].tag, self[nid].identifier))
+        if self[nid].access:
+            label = ("{0}".format(self[nid].tag)) if idhidden else ("{0}[{1}] Access:{2}".format(self[nid].tag, self[nid].identifier, self[nid].access.access))
+        else:
+            label = ("{0}".format(self[nid].tag)) if idhidden else ("{0}[{1}]".format(self[nid].tag, self[nid].identifier))
         filter = (self._real_true) if (filter is None) else filter
 
         if level == self.ROOT:
