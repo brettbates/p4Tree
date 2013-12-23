@@ -119,6 +119,33 @@ class Tree(object):
                 leaves.append(node)
         return leaves
 
+
+    def prune_no_access_leaves(self, root=None):
+        """
+        Delete leaves that have 0 access
+        """
+        for node in self.expand_tree(root):
+            if self[node].is_leaf() and self[node].access.binary == 0:
+                self.remove_node(node)
+
+
+    def link_past_node(self, nid):
+        """
+        Delete a node by linking past it.
+        For example, if we have a -> b -> c
+        and delete node b, we are left with a -> c
+        """
+        #Get the parent of the node we are linking past
+        parent = self[self[nid].bpointer]
+        #Set the children of the node to the parent
+        for child in self[nid].fpointer:
+            self[child].update_bpointer(parent.identifier)
+        #Link the children to the parent
+        parent.fpointer += self[nid].fpointer
+        #Delete the node
+        parent.update_fpointer(nid, mode=parent.DELETE)
+
+
     def add_node(self, node, parent=None):
         """
         Add a new node to tree.

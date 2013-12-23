@@ -7,6 +7,7 @@ setup.py
 examples/family_tree.py
 examples/folder_tree.py
 p4treelib/__init__.py
+p4treelib/link_past_node.py
 p4treelib/node.py
 p4treelib/tree.py
 p4treelib.egg-info/PKG-INFO
