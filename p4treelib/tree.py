@@ -152,6 +152,7 @@ class Tree(object):
         parent.fpointer += self[nid].fpointer
         #Delete the node
         parent.update_fpointer(nid, mode=parent.DELETE)
+        del(self._nodes[nid])
 
     def add_node(self, node, parent=None):
         """
