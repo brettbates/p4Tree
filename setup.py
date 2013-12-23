@@ -12,7 +12,7 @@ setup(
     description = 'pyTree with added access level. Based completely off of: https://github.com/caesar0301/pyTree, all credit goes to the creator',
     long_description='''This is a simple tree data structure implementation in python.''',
     license = "LICENSE",
-    packages = ['treelib'],
+    packages = ['p4treelib'],
     keywords = ['data structure', 'tree', 'tools'],
     classifiers = [
         'Development Status :: 4 - Beta',
