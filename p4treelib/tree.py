@@ -35,6 +35,9 @@ class Tree(object):
             else:
                 self._nodes = tree._nodes
 
+    def __str__(self):
+        return self.to_str()
+
     def to_str(self, nid=None, level=ROOT, idhidden=True, filter=None, cmp=None, key=None, reverse=False, show_access=False, tree_str=''):
         """Same as show, but returning a string to use instead of just printing it.
         """
