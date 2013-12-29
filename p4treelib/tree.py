@@ -35,6 +35,42 @@ class Tree(object):
             else:
                 self._nodes = tree._nodes
 
+    def to_str(self, nid=None, level=ROOT, idhidden=True, filter=None, cmp=None, key=None, reverse=False, show_access=False, tree_str=''):
+        """Same as show, but returning a string to use instead of just printing it.
+        """
+        leading = ''
+        lasting = '|___ '
+
+        nid = self.root if (nid is None) else nid
+        if not self.contains(nid):
+            raise NodeIDAbsentError("Node '%s' is not in the tree" % nid)
+
+        if show_access:
+            label = ("{0} Access: {1}".format(self[nid].tag, self[nid].access.access)) if idhidden else ("{0}[{1}] Access: {2}".format(self[nid].tag, self[nid].identifier, self[nid].access.access))
+        else:
+            label = ("{0}".format(self[nid].tag)) if idhidden else ("{0}[{1}]".format(self[nid].tag, self[nid].identifier))
+
+        filter = (self._real_true) if (filter is None) else filter
+
+        if level == self.ROOT:
+            tree_str += label + '\n'
+        else:
+            if level <= 1:
+                leading += ('|' + ' ' * 4) * (level - 1)
+            else:
+                leading += ('|' + ' ' * 4) + (' ' * 5 * (level - 2))
+            tree_str += "{0}{1}{2}\n".format(leading, lasting, label)
+
+        if filter(self[nid]) and self[nid].expanded:
+            queue = [self[i] for i in self[nid].fpointer if filter(self[i])]
+            key = (lambda x: x) if (key is None) else key
+            queue.sort(cmp=cmp, key=key, reverse=reverse)
+            level += 1
+            for element in queue:
+                tree_str = self.to_str(element.identifier, level, idhidden, filter, cmp, key, reverse, show_access, tree_str)
+
+        return tree_str
+
 
     @property
     def nodes(self):
@@ -353,7 +389,7 @@ class Tree(object):
         return True
 
 
-    def show(self, nid=None, level=ROOT, idhidden=True, filter=None, cmp=None, key=None, reverse=False):
+    def show(self, nid=None, level=ROOT, idhidden=True, filter=None, cmp=None, key=None, reverse=False, show_access=False):
         """"
         Another implementation of printing tree using Stack
         Print tree structure in hierarchy style.
@@ -377,10 +413,11 @@ class Tree(object):
         if not self.contains(nid):
             raise NodeIDAbsentError("Node '%s' is not in the tree" % nid)
 
-        if self[nid].access:
-            label = ("{0}".format(self[nid].tag)) if idhidden else ("{0}[{1}] Access:{2}".format(self[nid].tag, self[nid].identifier, self[nid].access.access))
+        if show_access:
+            label = ("{0} Access: {1}".format(self[nid].tag, self[nid].access.access)) if idhidden else ("{0}[{1}] Access: {2}".format(self[nid].tag, self[nid].identifier, self[nid].access.access))
         else:
             label = ("{0}".format(self[nid].tag)) if idhidden else ("{0}[{1}]".format(self[nid].tag, self[nid].identifier))
+
         filter = (self._real_true) if (filter is None) else filter
 
         if level == self.ROOT:
