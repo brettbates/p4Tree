@@ -438,7 +438,7 @@ class Tree(object):
             queue.sort(cmp=cmp, key=key, reverse=reverse)
             level += 1
             for element in queue:
-                self.show(element.identifier, level, idhidden, filter, cmp, key, reverse)
+                self.show(element.identifier, level, idhidden, filter, cmp, key, reverse, show_access=show_access)
 
 
     def subtree(self, nid):
