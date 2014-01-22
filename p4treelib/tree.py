@@ -190,10 +190,6 @@ class Tree(object):
                         self.remove_node(node)
                         changed = True
         else:
-            """
-            I don't think i like the idea of prunining no access leaves, kind of makes the graph wrong
-            TODO leaving just in case
-            """
             if simplified:
                 for node in self.expand_tree(root):
                     if self[node].is_leaf() and self[node].access.binary == 0:
@@ -511,7 +507,11 @@ class Tree(object):
             new_t = Tree(t.subtree(t.root), deepcopy=True)
         This line creates a deep copy of the entire tree.
         """
-        st = Tree()
+        if self.typed:
+            st = Tree()
+        else:
+            st = Tree(typed=True)
+
         if nid is None:
             return st
 
