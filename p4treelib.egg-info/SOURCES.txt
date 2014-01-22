@@ -8,14 +8,10 @@ examples/family_tree.py
 examples/folder_tree.py
 p4treelib/__init__.py
 p4treelib/node.py
-p4treelib/test_prune.py
-p4treelib/test_root.py
-p4treelib/test_tree.py
-p4treelib/test_typed_tree.py
 p4treelib/tree.py
 p4treelib.egg-info/PKG-INFO
 p4treelib.egg-info/SOURCES.txt
 p4treelib.egg-info/dependency_links.txt
 p4treelib.egg-info/top_level.txt
 tests/__init__.py
-tests/test_treelib.py
+tests/test_p4treelib.py

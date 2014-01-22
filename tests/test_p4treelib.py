@@ -91,6 +91,19 @@ class AccessTreeCase(unittest.TestCase):
         self.assertEqual(self.t.size(), 1)
         self.t.show(show_access=True)
 
+    def test_prune_simplified(self):
+        self.t.create_node("y","y", parent="x", access=access(binary=0))
+        self.t.create_node("b","b", parent="x", access=access(binary=0))
+        self.t.create_node("c","c", parent="b", access=access(binary=0))
+        self.t.create_node("z","z", parent="y", access=access(binary=0))
+        self.t.create_node("a","a", parent="y", access=access(binary=5))
+
+        changed = True
+        while changed:
+            changed = self.t.prune_no_access_leaves(simplified=True)
+        self.assertEqual(self.t.size(), 3)
+        self.t.show(show_access=True)
+
     def test_prune(self):
         self.t.create_node("y","y", parent="x", access=access(binary=0))
         self.t.create_node("b","b", parent="x", access=access(binary=0))
@@ -100,10 +113,9 @@ class AccessTreeCase(unittest.TestCase):
 
         changed = True
         while changed:
-            changed = self.t.prune_no_access_leaves()
-        self.assertEqual(self.t.size(), 3)
+            changed = self.t.prune_no_access_leaves(simplified=False)
+        self.assertEqual(self.t.size(), 6)
         self.t.show(show_access=True)
-
 
 class TypedTreeCase(unittest.TestCase):
 
@@ -116,6 +128,30 @@ class TypedTreeCase(unittest.TestCase):
         t.create_node("z","z", parent="y", user=True, access=access(binary=0))
         t.create_node("a","a", parent="y", user=True, access=access(binary=5))
         self.t = t
+
+    def test_link_past_node_with_users(self):
+        self.t.create_node("d","d", parent="y", path=True)
+        self.t.create_node("e","e", parent="d", user=True, access=access(binary=5))
+        self.t.create_node("f","f", parent="d", path=True)
+
+        self.t.link_past_node("y")
+
+        with self.assertRaises(KeyError):
+            self.t['y']
+
+        with self.assertRaises(KeyError):
+            self.t['z']
+
+        with self.assertRaises(KeyError):
+            self.t['a']
+
+        self.assertIn('d',self.t['x'].fpointer)
+        self.assertIn('e',self.t['d'].fpointer)
+        self.assertIn('f',self.t['d'].fpointer)
+
+        self.assertEqual('x',self.t['d'].bpointer)
+        self.assertEqual('d',self.t['e'].bpointer)
+        self.assertEqual('d',self.t['f'].bpointer)
 
     def test_prune_typed(self):
         changed = True

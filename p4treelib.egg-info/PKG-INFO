@@ -1,7 +1,7 @@
 Metadata-Version: 1.1
 Name: p4treelib
 Version: 1.3
-Summary: pyTree with added access level. Based completely off of: https://github.com/caesar0301/pyTree, much of the credit goes to the creator caesar0301
+Summary: pyTree with added access level and option to differentiate node typed between a user and a path. Based completely off of: https://github.com/caesar0301/pyTree, much of the credit goes to the creator caesar0301
 Home-page: https://github.com/brettbates/p4treelib
 Author: brettbates
 Author-email: mogwairn@gmail.com

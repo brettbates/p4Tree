@@ -1,5 +1,5 @@
 from node import Node
-from copy import deepcopy
+from copy import deepcopy, copy
 
 __author__ = 'chenxm'
 
@@ -190,10 +190,15 @@ class Tree(object):
                         self.remove_node(node)
                         changed = True
         else:
-            for node in self.expand_tree(root):
-                if self[node].is_leaf() and self[node].access.binary == 0:
-                    self.remove_node(node)
-                    changed = True
+            """
+            I don't think i like the idea of prunining no access leaves, kind of makes the graph wrong
+            TODO leaving just in case
+            """
+            if simplified:
+                for node in self.expand_tree(root):
+                    if self[node].is_leaf() and self[node].access.binary == 0:
+                        self.remove_node(node)
+                        changed = True
 
         return changed
 
@@ -209,10 +214,11 @@ class Tree(object):
                 raise LinkPastRootNodeError("Cannot link past the root node, delete it with remove_node()")
             #Get the parent of the node we are linking past
             parent = self[self[nid].bpointer]
-            #Set the children of the node to the parent
-            for child in self[nid].fpointer:
+            #Get rid of the nodes children if they are users
+            #else update the bpointer to the parent
+            for child in copy(self[nid].fpointer):
                 if self[child].user:
-                    del(self._nodes[nid])
+                    self.remove_node(child)
                 else:
                     self[child].update_bpointer(parent.identifier)
             #Link the children to the parent
