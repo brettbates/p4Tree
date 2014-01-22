@@ -9,7 +9,7 @@ class Node(object):
     (ADD, DELETE, INSERT) = range(3)
 
 
-    def __init__(self, tag=None, identifier=None, expanded=True, access=None):
+    def __init__(self, tag=None, identifier=None, expanded=True, access=None, user=False, path=False):
         self._identifier = None
         self._set_identifier(identifier)
         if tag is None:
@@ -20,7 +20,8 @@ class Node(object):
         self._bpointer = None
         self._fpointer = list()
         self.access = access
-
+        self.user = user
+        self.path = path
 
     def _set_identifier(self, identifier):
         if identifier is None:
@@ -32,8 +33,8 @@ class Node(object):
     @classmethod
     def sanitize_id(cls, identifier):
         if isinstance(identifier, str):
-            #return identifier.strip().replace(" ", "_")
-            return identifier
+            return identifier.strip().replace(" ", "_")
+            #return identifier
         elif isinstance(identifier, int):
             return identifier
         elif isinstance(identifier, unicode):
@@ -115,7 +116,8 @@ class Node(object):
             self.update_fpointer(identifier)
 
     def is_leaf(self):
-        if len(self.fpointer) == 0:
+        #If it is a typed tree
+        if len(self._fpointer) == 0:
             return True
         else:
             return False

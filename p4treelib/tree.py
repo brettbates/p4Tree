@@ -3,7 +3,6 @@ from copy import deepcopy
 
 __author__ = 'chenxm'
 
-
 class NodeIDAbsentError(Exception):
     pass
 
@@ -16,17 +15,21 @@ class DuplicatedNodeIdError(Exception):
 class LinkPastRootNodeError(Exception):
     pass
 
+class CannotPruneException(Exception):
+    pass
+
 class Tree(object):
 
     (ROOT, DEPTH, WIDTH, ZIGZAG) = range(4)
 
 
-    def __init__(self, tree=None, deep=False):
+    def __init__(self, tree=None, deep=False, typed=False):
         """
         Initiate a new tree or copy another tree with a shallow or deep copy.
         """
         self._nodes = {}
         self.root = None
+        self.typed = typed
         if tree is not None:
             self.root = tree.root
             if deep:
@@ -48,8 +51,11 @@ class Tree(object):
         if not self.contains(nid):
             raise NodeIDAbsentError("Node '%s' is not in the tree" % nid)
 
-        if show_access:
-            label = ("{0} Access: {1}".format(self[nid].tag, self[nid].access.access)) if idhidden else ("{0}[{1}] Access: {2}".format(self[nid].tag, self[nid].identifier, self[nid].access.access))
+        if (show_access and not self.typed) or (show_access and self.typed and self[nid].user and self[nid].access):
+            if idhidden:
+                label = ("{0} Access: {1}".format(self[nid].tag, self[nid].access.access))
+            else:
+                label = ("{0}[{1}] Access: {2}".format(self[nid].tag, self[nid].identifier, self[nid].access.access))
         else:
             label = ("{0}".format(self[nid].tag)) if idhidden else ("{0}[{1}]".format(self[nid].tag, self[nid].identifier))
 
@@ -161,15 +167,33 @@ class Tree(object):
         return leaves
 
 
-    def prune_no_access_leaves(self, root=None):
+    def prune_no_access_leaves(self, root=None, simplified=False):
         """
         Delete leaves that have 0 access
+        TODO change so it only prunes if there are no differences between this and the last node?
+        TODO change so it clears out early on no access nodes?
         """
+        if self.size() == 0:
+            raise CannotPruneException("No tree to prune")
+
         changed = False
-        for node in self.expand_tree(root):
-            if self[node].is_leaf() and self[node].access.binary == 0:
-                self.remove_node(node)
-                changed = True
+
+        if self.typed:
+            #TODO hmmm bit iffy is it really needed?
+            for node in [n for n in self.expand_tree(root)]:
+                if self[node].is_leaf():
+                    if self[node].path:
+                        if len(self[node].fpointer) == 0:
+                            self.remove_node(node)
+                            changed = True
+                    if simplified and self[node].user and self[node].access.binary == 0:
+                        self.remove_node(node)
+                        changed = True
+        else:
+            for node in self.expand_tree(root):
+                if self[node].is_leaf() and self[node].access.binary == 0:
+                    self.remove_node(node)
+                    changed = True
 
         return changed
 
@@ -180,18 +204,35 @@ class Tree(object):
         For example, if we have a -> b -> c
         and delete node b, we are left with a -> c
         """
-        if self.root == nid:
-            raise LinkPastRootNodeError("Cannot link past the root node, delete it with remove_node()")
-        #Get the parent of the node we are linking past
-        parent = self[self[nid].bpointer]
-        #Set the children of the node to the parent
-        for child in self[nid].fpointer:
-            self[child].update_bpointer(parent.identifier)
-        #Link the children to the parent
-        parent.fpointer += self[nid].fpointer
-        #Delete the node
-        parent.update_fpointer(nid, mode=parent.DELETE)
-        del(self._nodes[nid])
+        if self.typed:
+            if self.root == nid:
+                raise LinkPastRootNodeError("Cannot link past the root node, delete it with remove_node()")
+            #Get the parent of the node we are linking past
+            parent = self[self[nid].bpointer]
+            #Set the children of the node to the parent
+            for child in self[nid].fpointer:
+                if self[child].user:
+                    del(self._nodes[nid])
+                else:
+                    self[child].update_bpointer(parent.identifier)
+            #Link the children to the parent
+            parent.fpointer += self[nid].fpointer
+            #Delete the node
+            parent.update_fpointer(nid, mode=parent.DELETE)
+            del(self._nodes[nid])
+        else:
+            if self.root == nid:
+                raise LinkPastRootNodeError("Cannot link past the root node, delete it with remove_node()")
+            #Get the parent of the node we are linking past
+            parent = self[self[nid].bpointer]
+            #Set the children of the node to the parent
+            for child in self[nid].fpointer:
+                self[child].update_bpointer(parent.identifier)
+            #Link the children to the parent
+            parent.fpointer += self[nid].fpointer
+            #Delete the node
+            parent.update_fpointer(nid, mode=parent.DELETE)
+            del(self._nodes[nid])
 
     def add_node(self, node, parent=None):
         """
@@ -217,11 +258,17 @@ class Tree(object):
         self.__update_bpointer(node.identifier, parent)
 
 
-    def create_node(self, tag=None, identifier=None, parent=None, access=None):
+    def create_node(self, tag=None, identifier=None, parent=None, access=None, user=False, path=False):
         """
         Create a child node for the node indicated by the 'parent' parameter.
         """
-        node = Node(tag, identifier,access=access)
+        if user:
+            node = Node(tag, identifier, access=access, user=True)
+        elif path:
+            node = Node(tag, identifier, path=True)
+        else:
+            node = Node(tag, identifier,access=access)
+
         self.add_node(node, parent)
         return node
 
@@ -240,7 +287,12 @@ class Tree(object):
         filter = self._real_true if (filter is None) else filter
         if filter(self[nid]):
             yield nid
-            queue = [self[i] for i in self[nid].fpointer if filter(self[i])]
+
+            if self.size() == 0:
+                queue = []
+            else:
+                queue = [self[i] for i in self[nid].fpointer if filter(self[i])]
+
             if mode in [self.DEPTH, self.WIDTH]:
                 queue.sort(cmp=cmp, key=key, reverse=reverse)
                 while queue:
@@ -416,8 +468,11 @@ class Tree(object):
         if not self.contains(nid):
             raise NodeIDAbsentError("Node '%s' is not in the tree" % nid)
 
-        if show_access:
-            label = ("{0} Access: {1}".format(self[nid].tag, self[nid].access.access)) if idhidden else ("{0}[{1}] Access: {2}".format(self[nid].tag, self[nid].identifier, self[nid].access.access))
+        if (show_access and not self.typed) or (show_access and self.typed and self[nid].user and self[nid].access):
+            if idhidden:
+                label = ("{0} Access: {1}".format(self[nid].tag, self[nid].access.access))
+            else:
+                label = ("{0}[{1}] Access: {2}".format(self[nid].tag, self[nid].identifier, self[nid].access.access))
         else:
             label = ("{0}".format(self[nid].tag)) if idhidden else ("{0}[{1}]".format(self[nid].tag, self[nid].identifier))
 

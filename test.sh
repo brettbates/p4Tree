@@ -1,2 +1,2 @@
 #!/bin/bash
-nosetests --with-coverage --cover-package treelib --cover-erase
+nosetests --with-coverage --cover-package p4treelib --cover-erase

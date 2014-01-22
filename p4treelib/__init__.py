@@ -1,4 +1,4 @@
-from .tree import Tree
+from .tree import Tree, CannotPruneException
 from .node import Node
 
-__version__ = '1.2.5'
+__version__ = '1.3'

@@ -1,18 +1,18 @@
 import os
 import sys
 from setuptools import setup
-from treelib import __version__
+from p4treelib import __version__
 
 setup(
     name = "p4treelib",
     version = __version__,
-    url = 'https://github.com/caesar0301/pyTree',
-    author = 'caesar0301',
-    author_email = 'chenxm35@gmail.com',
-    description = 'pyTree with added access level. Based completely off of: https://github.com/caesar0301/pyTree, all credit goes to the creator',
+    url = 'https://github.com/brettbates/p4treelib',
+    author = 'brettbates',
+    author_email = 'mogwairn@gmail.com',
+    description = 'pyTree with added access level and option to differentiate node typed between a user and a path. Based completely off of: https://github.com/caesar0301/pyTree, much of the credit goes to the creator caesar0301',
     long_description='''This is a simple tree data structure implementation in python.''',
     license = "LICENSE",
-    packages = ['p4treelib'],
+    packages = ['p4treelib', 'tests'],
     keywords = ['data structure', 'tree', 'tools'],
     classifiers = [
         'Development Status :: 4 - Beta',
