@@ -15,7 +15,12 @@ class Node(object):
         if tag is None:
             self._tag = str(self._identifier)
         else:
+            self._tag = tag
+        #TODO check that the tag can be cast to a string
+        """
+        else:
             self._tag = str(tag)
+        """
         self.expanded = expanded
         self._bpointer = None
         self._fpointer = list()
@@ -50,7 +55,8 @@ class Node(object):
 
     @tag.setter
     def tag(self, value):
-        self._tag = str(value) if value is not None else None
+        #self._tag = str(value) if value is not None else None
+        self._tag = value if value is not None else None
 
 
     @property

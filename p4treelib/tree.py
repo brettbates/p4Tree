@@ -71,9 +71,21 @@ class Tree(object):
             tree_str += "{0}{1}{2}\n".format(leading, lasting, label)
 
         if filter(self[nid]) and self[nid].expanded:
-            queue = [self[i] for i in self[nid].fpointer if filter(self[i])]
-            key = (lambda x: x) if (key is None) else key
-            queue.sort(cmp=cmp, key=key, reverse=reverse)
+            if self.typed:
+                users = []
+                paths = []
+                for node in self[nid].fpointer:
+                    if self[node].user:
+                        users.append(node)
+                    else:
+                        paths.append(node)
+
+                queue = [self[nid] for nid in (sorted(users) + sorted(paths))]
+            else:
+                queue = [self[i] for i in self[nid].fpointer if filter(self[i])]
+                key = (lambda x: x) if (key is None) else key
+                queue.sort(cmp=cmp, key=key, reverse=reverse)
+
             level += 1
             for element in queue:
                 tree_str = self.to_str(element.identifier, level, idhidden, filter, cmp, key, reverse, show_access, tree_str)

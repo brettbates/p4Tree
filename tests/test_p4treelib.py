@@ -216,9 +216,39 @@ class TypedPruningCase(unittest.TestCase):
             except:
                 self.fail("couldn't find node {} on self.t".format(node))
 
+class StrTypedTreeCase(unittest.TestCase):
+
+    def setUp(self):
+        t = Tree(typed=True)
+        t.create_node("//...","//...", path=True)
+        t.create_node("u2//...","u2//...", parent="//...", user=True, access=access(binary=0))
+        t.create_node("//two/...","//two/...", parent="//...", path=True)
+        t.create_node("//one/...","//one/...", parent="//...", path=True)
+        t.create_node("u1//...","u1//...", parent="//...", user=True, access=access(binary=0))
+        self.t = t
+
+    def test_to_str_user_path_alphabet_ordered(self):
+        #Just to check it is not a fluke
+        for x in range(5000):
+            users = []
+            paths = []
+            for node in self.t[self.t.root].fpointer:
+                if self.t[node].user:
+                    users.append(node)
+                else:
+                    paths.append(node)
+
+            queue = sorted(users) + sorted(paths)
+
+            self.assertSequenceEqual(queue, ("u1//...", "u2//...", "//one/...", "//two/..."))
+
+    def test_to_str(self):
+        for x in range(5000):
+            self.assertEqual(self.t.to_str(), "//...\n|___ u1//...\n|___ u2//...\n|___ //one/...\n|___ //two/...\n")
+
 
 def suite():
-    suites = [NodeCase, TreeCase, AccessTreeCase, TypedTreeCase, TypedPruningCase]
+    suites = [NodeCase, TreeCase, AccessTreeCase, TypedTreeCase, TypedPruningCase, StrTypedTreeCase]
     suite = unittest.TestSuite()
     for s in suites:
         suite.addTest(unittest.makeSuite(s))
