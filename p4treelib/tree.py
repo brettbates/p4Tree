@@ -42,7 +42,8 @@ class Tree(object):
         return self.to_str()
 
     def to_str(self, nid=None, level=ROOT, idhidden=True, filter=None, cmp=None, key=None, reverse=False, show_access=False, tree_str=''):
-        """Same as show, but returning a string to use instead of just printing it.
+        """
+        Same as show, but returning a string to use instead of just printing it.
         """
         leading = ''
         lasting = '|___ '
@@ -79,7 +80,7 @@ class Tree(object):
                         users.append(node)
                     else:
                         paths.append(node)
-
+                #TODO sort by access level
                 queue = [self[nid] for nid in (sorted(users) + sorted(paths))]
             else:
                 queue = [self[i] for i in self[nid].fpointer if filter(self[i])]
@@ -92,6 +93,66 @@ class Tree(object):
 
         return tree_str
 
+    def to_html(self, nid=None, level=ROOT, idhidden=True, filter=None, cmp=None, key=None, reverse=False, show_access=False, tree_str=''):
+        """
+        initial thoughts on writing a to_html method - probably better to use to_json and then javascript it into a sensible format
+        """
+        ul  = "<ul>"
+        ulc = "</ul>"
+        li  = "<li>"
+        lic = "</li>"
+
+        nid = self.root if (nid is None) else nid
+        if not self.contains(nid):
+            raise NodeIDAbsentError("Node '%s' is not in the tree" % nid)
+
+        if (show_access and not self.typed) or (show_access and self.typed and self[nid].user and self[nid].access):
+            if idhidden:
+                label = ("{0} Access: {1}".format(self[nid].tag, self[nid].access.access))
+            else:
+                label = ("{0}[{1}] Access: {2}".format(self[nid].tag, self[nid].identifier, self[nid].access.access))
+        else:
+            label = ("{0}".format(self[nid].tag)) if idhidden else ("{0}[{1}]".format(self[nid].tag, self[nid].identifier))
+
+        filter = (self._real_true) if (filter is None) else filter
+
+        if level == self.ROOT:
+            tree_html += ul + li + label
+        else:
+            """
+            add in css id's
+            if level <= 1:
+                leading += clss
+            else:
+                leading += ('|' + ' ' * 4) + (' ' * 5 * (level - 2))
+            """
+            tree_html += "{0}{1}{2}\n".format(leading, lasting, label)
+
+        if filter(self[nid]) and self[nid].expanded:
+            if self.typed:
+                users = []
+                paths = []
+                for node in self[nid].fpointer:
+                    if self[node].user:
+                        users.append(node)
+                    else:
+                        paths.append(node)
+                #TODO sort by access level
+                queue = [self[nid] for nid in (sorted(users) + sorted(paths))]
+            else:
+                queue = [self[i] for i in self[nid].fpointer if filter(self[i])]
+                key = (lambda x: x) if (key is None) else key
+                queue.sort(cmp=cmp, key=key, reverse=reverse)
+
+            level += 1
+            for element in queue:
+                tree_html = self.to_html(element.identifier, level, idhidden, filter, cmp, key, reverse, show_access, tree_html) + lic
+
+            tree_html += lic + ulc
+
+
+        return tree_html
+        import pdb; pdb.set_trace()
 
     @property
     def nodes(self):
