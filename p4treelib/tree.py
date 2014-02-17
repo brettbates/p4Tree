@@ -1,3 +1,4 @@
+import json
 from node import Node
 from copy import deepcopy, copy
 
@@ -92,6 +93,27 @@ class Tree(object):
 
         return tree_str
 
+    def to_dict(self, nid=None, key=None, reverse=False):
+        if self.typed:
+            return self.typed_to_dict(nid, key, reverse)
+        else:
+            nid = self.root if (nid is None) else nid
+            tree_dict = {str(self[nid].tag): {"children": []}}
+
+            if self[nid].expanded:
+                queue = [self[i] for i in self[nid].fpointer]
+                key = (lambda x: x) if (key is None) else key
+                queue.sort(key=key, reverse=reverse)
+
+                for elem in queue:
+                    tree_dict[str(self[nid].tag)]["children"].append(
+                        self.to_dict(elem.identifier))
+                if tree_dict[str(self[nid].tag)]["children"] == []:
+                    tree_dict = str(self[nid].tag)
+                return tree_dict
+
+    def to_json(self):
+        return json.dumps(self.to_dict())
 
     @property
     def nodes(self):
