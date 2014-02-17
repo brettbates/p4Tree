@@ -246,7 +246,7 @@ class StrTypedTreeCase(unittest.TestCase):
 
     def test_to_str_user_path_alphabet_ordered(self):
         #Just to check it is not a fluke
-        for x in range(5000):
+        for x in range(50):
             users = []
             paths = []
             for node in self.t[self.t.root].fpointer:
@@ -306,13 +306,14 @@ class ToDictTreeCase(unittest.TestCase):
         self.t = t
 
     def test_to_dict_user_path_alphabet_ordered(self):
-        #Just to check it is not a fluke
-        d = self.t.to_dict()
-        assert d == {'//...': {'children': ['u1//...', 'u2//...', {'//one/...': {'children': ['u1//one/...', 'u2//one/...', {'//one/red/...': {'children': ['u1//one/red/...', 'u2//one/red/...', {'//one/red/old/...': {'children': ['u1//one/red/old/...', 'u2//one/red/old/...']}}, '//one/red/new/...']}}, {'//one/blue/...': {'children': ['u1//one/blue/...', 'u2//one/blue/...']}}]}}, {'//two/...': {'children': ['u1//two/...', 'u2//two/...', {'//two/black/...': {'children': ['u1//two/black/...', 'u2//two/black/...']}}, {'//two/blue/...': {'children': ['u1//two/blue/...', 'u2//two/blue/...']}}]}}]}}
+        for x in range(0, 500):
+            d = self.t.to_dict()
+            assert d == {'//...': {'children': ['u1//...', 'u2//...', {'//one/...': {'children': ['u1//one/...', 'u2//one/...', {'//one/blue/...': {'children': ['u1//one/blue/...', 'u2//one/blue/...']}}, {'//one/red/...': {'children': ['u1//one/red/...', 'u2//one/red/...', '//one/red/new/...', {'//one/red/old/...': {'children': ['u1//one/red/old/...', 'u2//one/red/old/...']}}]}}]}}, {'//two/...': {'children': ['u1//two/...', 'u2//two/...', {'//two/black/...': {'children': ['u1//two/black/...', 'u2//two/black/...']}}, {'//two/blue/...': {'children': ['u1//two/blue/...', 'u2//two/blue/...']}}]}}]}}
+
 
 
 def suite():
-    suites = [NodeCase, TreeCase, AccessTreeCase, TypedTreeCase, TypedPruningCase, StrTypedTreeCase]
+    suites = [ToDictTreeCase] #[NodeCase, TreeCase, AccessTreeCase, TypedTreeCase, TypedPruningCase, StrTypedTreeCase, ToDictTreeCase, ToHtmlTreeCase]
     suite = unittest.TestSuite()
     for s in suites:
         suite.addTest(unittest.makeSuite(s))

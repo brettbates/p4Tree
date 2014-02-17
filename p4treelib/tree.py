@@ -43,7 +43,8 @@ class Tree(object):
         return self.to_str()
 
     def to_str(self, nid=None, level=ROOT, idhidden=True, filter=None, cmp=None, key=None, reverse=False, show_access=False, tree_str=''):
-        """Same as show, but returning a string to use instead of just printing it.
+        """
+        Same as show, but returning a string to use instead of just printing it.
         """
         leading = ''
         lasting = '|___ '
@@ -72,26 +73,27 @@ class Tree(object):
             tree_str += "{0}{1}{2}\n".format(leading, lasting, label)
 
         if filter(self[nid]) and self[nid].expanded:
-            if self.typed:
-                users = []
-                paths = []
-                for node in self[nid].fpointer:
-                    if self[node].user:
-                        users.append(node)
-                    else:
-                        paths.append(node)
-
-                queue = [self[nid] for nid in (sorted(users) + sorted(paths))]
-            else:
-                queue = [self[i] for i in self[nid].fpointer if filter(self[i])]
-                key = (lambda x: x) if (key is None) else key
-                queue.sort(cmp=cmp, key=key, reverse=reverse)
+            queue = self.order_nodes(nid, cmp, key, reverse)
 
             level += 1
             for element in queue:
                 tree_str = self.to_str(element.identifier, level, idhidden, filter, cmp, key, reverse, show_access, tree_str)
 
         return tree_str
+
+    def typed_to_dict(self, nid=None, key=None, reverse=False):
+        nid = self.root if (nid is None) else nid
+        tree_dict = {str(self[nid].tag): {"children": []}}
+
+        if self[nid].expanded:
+            queue = self.order_nodes(nid, key=key, reverse=reverse)
+
+            for elem in queue:
+                tree_dict[str(self[nid].tag)]["children"].append(
+                    self.typed_to_dict(elem.identifier))
+            if tree_dict[str(self[nid].tag)]["children"] == []:
+                tree_dict = str(self[nid].tag)
+            return tree_dict
 
     def to_dict(self, nid=None, key=None, reverse=False):
         if self.typed:
@@ -101,19 +103,44 @@ class Tree(object):
             tree_dict = {str(self[nid].tag): {"children": []}}
 
             if self[nid].expanded:
-                queue = [self[i] for i in self[nid].fpointer]
-                key = (lambda x: x) if (key is None) else key
-                queue.sort(key=key, reverse=reverse)
+                queue = self.order_nodes(nid, key=key, reverse=reverse)
 
                 for elem in queue:
                     tree_dict[str(self[nid].tag)]["children"].append(
                         self.to_dict(elem.identifier))
                 if tree_dict[str(self[nid].tag)]["children"] == []:
                     tree_dict = str(self[nid].tag)
+
                 return tree_dict
 
     def to_json(self):
         return json.dumps(self.to_dict())
+
+    def label(self, nid, show_access, idhidden):
+        if (show_access and not self.typed) or (show_access and self.typed and self[nid].user and self[nid].access):
+            if idhidden:
+                return ("{0} Access: {1}".format(self[nid].tag, self[nid].access.access))
+            else:
+                return ("{0}[{1}] Access: {2}".format(self[nid].tag, self[nid].identifier, self[nid].access.access))
+        else:
+            return ("{0}".format(self[nid].tag)) if idhidden else ("{0}[{1}]".format(self[nid].tag, self[nid].identifier))
+
+    def order_nodes(self, nid, cmp=None, key=None, reverse=None):
+        if self.typed:
+            users = []
+            paths = []
+            for node in self[nid].fpointer:
+                if self[node].user:
+                    users.append(node)
+                else:
+                    paths.append(node)
+            #TODO sort by access level
+            queue = [self[nid] for nid in (sorted(users) + sorted(paths))]
+        else:
+            queue = [self[i] for i in self[nid].fpointer]
+            key = (lambda x: x) if (key is None) else key
+            queue.sort(cmp=cmp, key=key, reverse=reverse)
+        return queue
 
     @property
     def nodes(self):
