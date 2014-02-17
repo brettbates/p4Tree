@@ -64,10 +64,12 @@ class TreeCase(unittest.TestCase):
     def tearDown(self):
         pass
 
+
 class access():
     def __init__(self, binary):
         self.access = "an access"
         self.binary = binary
+
 
 class AccessTreeCase(unittest.TestCase):
 
@@ -117,6 +119,7 @@ class AccessTreeCase(unittest.TestCase):
         self.assertEqual(self.t.size(), 6)
         self.t.show(show_access=True)
 
+
 class TypedTreeCase(unittest.TestCase):
 
     def setUp(self):
@@ -159,6 +162,7 @@ class TypedTreeCase(unittest.TestCase):
             changed = self.t.prune_no_access_leaves()
         self.t.show(show_access=True)
         self.assertEqual(self.t.size(), 4)
+
 
 class TypedPruningCase(unittest.TestCase):
 
@@ -215,6 +219,7 @@ class TypedPruningCase(unittest.TestCase):
                 self.t[node]
             except:
                 self.fail("couldn't find node {} on self.t".format(node))
+
 
 class StrTypedTreeCase(unittest.TestCase):
 
