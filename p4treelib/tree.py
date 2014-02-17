@@ -82,18 +82,21 @@ class Tree(object):
 
         return tree_str
 
-    def typed_to_jstree_dict(self, nid=None, key=None, reverse=False):
+    def typed_to_jstree_dict(self, nid=None, key=None, reverse=False, show_access=True):
         nid = self.root if (nid is None) else nid
-        tree_dict = OrderedDict([('string',str(self[nid].tag)), ('id',nid), ("children", [])])
+        if self[nid].access and show_access:
+            tree_dict = OrderedDict([('text',"{0} {1}".format(str(self[nid].tag), str(self[nid].access))), ('id',nid), ("children", [])])
+        else:
+            tree_dict = OrderedDict([('text',"{0}".format(str(self[nid].tag))), ('id',nid), ("children", [])])
 
         if self[nid].expanded:
             queue = self.order_nodes(nid, key=key, reverse=reverse)
 
             for elem in queue:
                 tree_dict["children"].append(
-                    self.typed_to_jstree_dict(elem.identifier))
+                    self.typed_to_jstree_dict(elem.identifier, key=key, reverse=reverse, show_access=show_access))
             if tree_dict["children"] == []:
-                tree_dict.pop("children")  # Tidy up the dict; not sure it helps or is necessary
+                tree_dict.pop("children")  # Tidy up the dict
 
             return tree_dict
 

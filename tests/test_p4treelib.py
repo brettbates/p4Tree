@@ -18,6 +18,9 @@ class access():
         self.access = "an access"
         self.binary = binary
 
+    def __str__(self):
+        return self.access
+
 
 class NodeCase(unittest.TestCase):
 	def setUp(self):
@@ -268,14 +271,14 @@ class ToDictTreeCase(unittest.TestCase):
 
     def setUp(self):
         t = Tree(typed=True)
-        t.create_node(AClass("//..."), "//...", path=True)
-        t.create_node(AClass("u1//..."), "u1//...", parent="//...", user=True, access=access(binary=0))
-        t.create_node(AClass("u2//..."),"u2//...", parent="//...", user=True, access=access(binary=0))
-        t.create_node(AClass("//one/..."),"//one/...", parent="//...", path=True)
-        t.create_node(AClass("u1//one/..."),"u1//one/...", parent="//one/...", user=True, access=access(binary=0))
-        t.create_node(AClass("u2//one/..."),"u2//one/...", parent="//one/...", user=True, access=access(binary=0))
-        t.create_node(AClass("//one/red/..."),"//one/red/...", parent="//one/...", path=True)
-        t.create_node(AClass("u1//one/red/..."),"u1//one/red/...", parent="//one/red/...",
+        t.create_node(AClass("AC//..."), "//...", path=True)
+        t.create_node(AClass("ACu1//..."), "u1//...", parent="//...", user=True, access=access(binary=0))
+        t.create_node(AClass("ACu2//..."),"u2//...", parent="//...", user=True, access=access(binary=0))
+        t.create_node(AClass("AC//one/..."),"//one/...", parent="//...", path=True)
+        t.create_node(AClass("ACu1//one/..."),"u1//one/...", parent="//one/...", user=True, access=access(binary=0))
+        t.create_node(AClass("ACu2//one/..."),"u2//one/...", parent="//one/...", user=True, access=access(binary=0))
+        t.create_node(AClass("AC//one/red/..."),"//one/red/...", parent="//one/...", path=True)
+        t.create_node(AClass("ACu1//one/red/..."),"u1//one/red/...", parent="//one/red/...",
                 user=True, access=access(binary=0))
         t.create_node("u2//one/red/...","u2//one/red/...", parent="//one/red/...",
                 user=True, access=access(binary=0))
@@ -308,104 +311,17 @@ class ToDictTreeCase(unittest.TestCase):
     def test_to_dict_user_path_alphabet_ordered(self):
         for x in range(0, 500):
             d = self.t.to_dict()
-            assert d == {'//...': {'children': ['u1//...', 'u2//...', {'//one/...': {'children': ['u1//one/...', 'u2//one/...', {'//one/blue/...': {'children': ['u1//one/blue/...', 'u2//one/blue/...']}}, {'//one/red/...': {'children': ['u1//one/red/...', 'u2//one/red/...', '//one/red/new/...', {'//one/red/old/...': {'children': ['u1//one/red/old/...', 'u2//one/red/old/...']}}]}}]}}, {'//two/...': {'children': ['u1//two/...', 'u2//two/...', {'//two/black/...': {'children': ['u1//two/black/...', 'u2//two/black/...']}}, {'//two/blue/...': {'children': ['u1//two/blue/...', 'u2//two/blue/...']}}]}}]}}
-
+            assert d == {'AC//...': {'children': ['ACu1//...', 'ACu2//...', {'AC//one/...': {'children': ['ACu1//one/...', 'ACu2//one/...', {'//one/blue/...': {'children': ['u1//one/blue/...', 'u2//one/blue/...']}}, {'AC//one/red/...': {'children': ['ACu1//one/red/...', 'u2//one/red/...', '//one/red/new/...', {'//one/red/old/...': {'children': ['u1//one/red/old/...', 'u2//one/red/old/...']}}]}}]}}, {'//two/...': {'children': ['u1//two/...', 'u2//two/...', {'//two/black/...': {'children': ['u1//two/black/...', 'u2//two/black/...']}}, {'//two/blue/...': {'children': ['u1//two/blue/...', 'u2//two/blue/...']}}]}}]}}
 
     def test_typed_to_jstree_dict_user_path_alphabet_ordered(self):
         for x in range(0, 500):
-            d = self.t.typed_to_jstree_dict()
-            assert d == {
-                            "string" : "//...",
-                            "id" : "//...",
-                            "children" : [{
-                                    "string" : "u1//...",
-                                    "id" : "u1//..."
-                                }, {
-                                    "string" : "u2//...",
-                                    "id" : "u2//..."
-                                }, {
-                                    "string" : "//one/...",
-                                    "id" : "//one/...",
-                                    "children" : [{
-                                            "string" : "u1//one/...",
-                                            "id" : "u1//one/..."
-                                        }, {
-                                            "string" : "u2//one/...",
-                                            "id" : "u2//one/..."
-                                        }, {
-                                            "string" : "//one/blue/...",
-                                            "id" : "//one/blue/...",
-                                            "children" : [{
-                                                    "string" : "u1//one/blue/...",
-                                                    "id" : "u1//one/blue/..."
-                                                }, {
-                                                    "string" : "u2//one/blue/...",
-                                                    "id" : "u2//one/blue/..."
-                                                }
-                                            ]
-                                        }, {
-                                            "string" : "//one/red/...",
-                                            "id" : "//one/red/...",
-                                            "children" : [{
-                                                    "string" : "u1//one/red/...",
-                                                    "id" : "u1//one/red/..."
-                                                }, {
-                                                    "string" : "u2//one/red/...",
-                                                    "id" : "u2//one/red/..."
-                                                }, {
-                                                    "string" : "//one/red/new/...",
-                                                    "id" : "//one/red/new/..."
-                                                }, {
-                                                    "string" : "//one/red/old/...",
-                                                    "id" : "//one/red/old/...",
-                                                    "children" : [{
-                                                            "string" : "u1//one/red/old/...",
-                                                            "id" : "u1//one/red/old/..."
-                                                        }, {
-                                                            "string" : "u2//one/red/old/...",
-                                                            "id" : "u2//one/red/old/..."
-                                                        }
-                                                    ]
-                                                }
-                                            ]
-                                        }
-                                    ]
-                                }, {
-                                    "string" : "//two/...",
-                                    "id" : "//two/...",
-                                    "children" : [{
-                                            "string" : "u1//two/...",
-                                            "id" : "u1//two/..."
-                                        }, {
-                                            "string" : "u2//two/...",
-                                            "id" : "u2//two/..."
-                                        }, {
-                                            "string" : "//two/black/...",
-                                            "id" : "//two/black/...",
-                                            "children" : [{
-                                                    "string" : "u1//two/black/...",
-                                                    "id" : "u1//two/black/..."
-                                                }, {
-                                                    "string" : "u2//two/black/...",
-                                                    "id" : "u2//two/black/..."
-                                                }
-                                            ]
-                                        }, {
-                                            "string" : "//two/blue/...",
-                                            "id" : "//two/blue/...",
-                                            "children" : [{
-                                                    "string" : "u1//two/blue/...",
-                                                    "id" : "u1//two/blue/..."
-                                                }, {
-                                                    "string" : "u2//two/blue/...",
-                                                    "id" : "u2//two/blue/..."
-                                                }
-                                            ]
-                                        }
-                                    ]
-                                }
-                            ]
-                        }
+            d = self.t.typed_to_jstree_dict(show_access=False)
+            assert d == {"text": "AC//...", "id": "//...", "children": [{"text": "ACu1//...", "id": "u1//..."}, {"text": "ACu2//...", "id": "u2//..."}, {"text": "AC//one/...", "id": "//one/...", "children": [{"text": "ACu1//one/...", "id": "u1//one/..."}, {"text": "ACu2//one/...", "id": "u2//one/..."}, {"text": "//one/blue/...", "id": "//one/blue/...", "children": [{"text": "u1//one/blue/...", "id": "u1//one/blue/..."}, {"text": "u2//one/blue/...", "id": "u2//one/blue/..."}]}, {"text": "AC//one/red/...", "id": "//one/red/...", "children": [{"text": "ACu1//one/red/...", "id": "u1//one/red/..."}, {"text": "u2//one/red/...", "id": "u2//one/red/..."}, {"text": "//one/red/new/...", "id": "//one/red/new/..."}, {"text": "//one/red/old/...", "id": "//one/red/old/...", "children": [{"text": "u1//one/red/old/...", "id": "u1//one/red/old/..."}, {"text": "u2//one/red/old/...", "id": "u2//one/red/old/..."}]}]}]}, {"text": "//two/...", "id": "//two/...", "children": [{"text": "u1//two/...", "id": "u1//two/..."}, {"text": "u2//two/...", "id": "u2//two/..."}, {"text": "//two/black/...", "id": "//two/black/...", "children": [{"text": "u1//two/black/...", "id": "u1//two/black/..."}, {"text": "u2//two/black/...", "id": "u2//two/black/..."}]}, {"text": "//two/blue/...", "id": "//two/blue/...", "children": [{"text": "u1//two/blue/...", "id": "u1//two/blue/..."}, {"text": "u2//two/blue/...", "id": "u2//two/blue/..."}]}]}]}
+
+    def test_typed_to_jstree_dict_user_path_alphabet_ordered_access(self):
+        for x in range(0, 500):
+            d = self.t.typed_to_jstree_dict(show_access=True)
+            assert d == {"text": "AC//...", "id": "//...", "children": [{"text": "ACu1//... an access", "id": "u1//..."}, {"text": "ACu2//... an access", "id": "u2//..."}, {"text": "AC//one/...", "id": "//one/...", "children": [{"text": "ACu1//one/... an access", "id": "u1//one/..."}, {"text": "ACu2//one/... an access", "id": "u2//one/..."}, {"text": "//one/blue/...", "id": "//one/blue/...", "children": [{"text": "u1//one/blue/... an access", "id": "u1//one/blue/..."}, {"text": "u2//one/blue/... an access", "id": "u2//one/blue/..."}]}, {"text": "AC//one/red/...", "id": "//one/red/...", "children": [{"text": "ACu1//one/red/... an access", "id": "u1//one/red/..."}, {"text": "u2//one/red/... an access", "id": "u2//one/red/..."}, {"text": "//one/red/new/...", "id": "//one/red/new/..."}, {"text": "//one/red/old/...", "id": "//one/red/old/...", "children": [{"text": "u1//one/red/old/... an access", "id": "u1//one/red/old/..."}, {"text": "u2//one/red/old/... an access", "id": "u2//one/red/old/..."}]}]}]}, {"text": "//two/...", "id": "//two/...", "children": [{"text": "u1//two/... an access", "id": "u1//two/..."}, {"text": "u2//two/... an access", "id": "u2//two/..."}, {"text": "//two/black/...", "id": "//two/black/...", "children": [{"text": "u1//two/black/... an access", "id": "u1//two/black/..."}, {"text": "u2//two/black/... an access", "id": "u2//two/black/..."}]}, {"text": "//two/blue/...", "id": "//two/blue/...", "children": [{"text": "u1//two/blue/... an access", "id": "u1//two/blue/..."}, {"text": "u2//two/blue/... an access", "id": "u2//two/blue/..."}]}]}]}
 
 def suite():
     suites = [ToDictTreeCase] #[NodeCase, TreeCase, AccessTreeCase, TypedTreeCase, TypedPruningCase, StrTypedTreeCase, ToDictTreeCase, ToHtmlTreeCase]
