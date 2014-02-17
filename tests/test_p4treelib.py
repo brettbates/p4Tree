@@ -1,6 +1,24 @@
 import unittest
 from p4treelib import Tree, Node
 
+class AClass(object):
+
+    def __init__(self, data):
+        self.data = data
+
+    def __unicode__(self):
+        return str(self.data)
+
+    def __str__(self):
+        return self.__unicode__()
+
+
+class access():
+    def __init__(self, binary):
+        self.access = "an access"
+        self.binary = binary
+
+
 class NodeCase(unittest.TestCase):
 	def setUp(self):
 		self.node1 = Node("Test One", "ide ntifier 1 ")
@@ -63,12 +81,6 @@ class TreeCase(unittest.TestCase):
 
     def tearDown(self):
         pass
-
-
-class access():
-    def __init__(self, binary):
-        self.access = "an access"
-        self.binary = binary
 
 
 class AccessTreeCase(unittest.TestCase):
@@ -250,6 +262,53 @@ class StrTypedTreeCase(unittest.TestCase):
     def test_to_str(self):
         for x in range(5000):
             self.assertEqual(self.t.to_str(), "//...\n|___ u1//...\n|___ u2//...\n|___ //one/...\n|___ //two/...\n")
+
+
+class ToDictTreeCase(unittest.TestCase):
+
+    def setUp(self):
+        t = Tree(typed=True)
+        t.create_node(AClass("//..."), "//...", path=True)
+        t.create_node(AClass("u1//..."), "u1//...", parent="//...", user=True, access=access(binary=0))
+        t.create_node(AClass("u2//..."),"u2//...", parent="//...", user=True, access=access(binary=0))
+        t.create_node(AClass("//one/..."),"//one/...", parent="//...", path=True)
+        t.create_node(AClass("u1//one/..."),"u1//one/...", parent="//one/...", user=True, access=access(binary=0))
+        t.create_node(AClass("u2//one/..."),"u2//one/...", parent="//one/...", user=True, access=access(binary=0))
+        t.create_node(AClass("//one/red/..."),"//one/red/...", parent="//one/...", path=True)
+        t.create_node(AClass("u1//one/red/..."),"u1//one/red/...", parent="//one/red/...",
+                user=True, access=access(binary=0))
+        t.create_node("u2//one/red/...","u2//one/red/...", parent="//one/red/...",
+                user=True, access=access(binary=0))
+        t.create_node("//one/red/old/...","//one/red/old/...", parent="//one/red/...", path=True)
+        t.create_node("u1//one/red/old/...","u1//one/red/old/...", parent="//one/red/old/...",
+                user=True, access=access(binary=0))
+        t.create_node("u2//one/red/old/...","u2//one/red/old/...", parent="//one/red/old/...",
+                user=True, access=access(binary=0))
+        t.create_node("//one/red/new/...","//one/red/new/...", parent="//one/red/...", path=True)
+        t.create_node("//one/blue/...","//one/blue/...", parent="//one/...", path=True)
+        t.create_node("u1//one/blue/...","u1//one/blue/...", parent="//one/blue/...",
+                user=True, access=access(binary=0))
+        t.create_node("u2//one/blue/...","u2//one/blue/...", parent="//one/blue/...",
+                user=True, access=access(binary=0))
+        t.create_node("//two/...","//two/...", parent="//...", path=True)
+        t.create_node("u1//two/...","u1//two/...", parent="//two/...", user=True, access=access(binary=0))
+        t.create_node("u2//two/...","u2//two/...", parent="//two/...", user=True, access=access(binary=0))
+        t.create_node("//two/black/...","//two/black/...", parent="//two/...", path=True)
+        t.create_node("u1//two/black/...","u1//two/black/...", parent="//two/black/...",
+                user=True, access=access(binary=0))
+        t.create_node("u2//two/black/...","u2//two/black/...", parent="//two/black/...",
+                user=True, access=access(binary=0))
+        t.create_node("//two/blue/...","//two/blue/...", parent="//two/...", path=True)
+        t.create_node("u1//two/blue/...","u1//two/blue/...", parent="//two/blue/...",
+                user=True, access=access(binary=0))
+        t.create_node("u2//two/blue/...","u2//two/blue/...", parent="//two/blue/...",
+                user=True, access=access(binary=0))
+        self.t = t
+
+    def test_to_dict_user_path_alphabet_ordered(self):
+        #Just to check it is not a fluke
+        d = self.t.to_dict()
+        assert d == {'//...': {'children': ['u1//...', 'u2//...', {'//one/...': {'children': ['u1//one/...', 'u2//one/...', {'//one/red/...': {'children': ['u1//one/red/...', 'u2//one/red/...', {'//one/red/old/...': {'children': ['u1//one/red/old/...', 'u2//one/red/old/...']}}, '//one/red/new/...']}}, {'//one/blue/...': {'children': ['u1//one/blue/...', 'u2//one/blue/...']}}]}}, {'//two/...': {'children': ['u1//two/...', 'u2//two/...', {'//two/black/...': {'children': ['u1//two/black/...', 'u2//two/black/...']}}, {'//two/blue/...': {'children': ['u1//two/blue/...', 'u2//two/blue/...']}}]}}]}}
 
 
 def suite():
