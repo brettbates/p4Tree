@@ -311,6 +311,101 @@ class ToDictTreeCase(unittest.TestCase):
             assert d == {'//...': {'children': ['u1//...', 'u2//...', {'//one/...': {'children': ['u1//one/...', 'u2//one/...', {'//one/blue/...': {'children': ['u1//one/blue/...', 'u2//one/blue/...']}}, {'//one/red/...': {'children': ['u1//one/red/...', 'u2//one/red/...', '//one/red/new/...', {'//one/red/old/...': {'children': ['u1//one/red/old/...', 'u2//one/red/old/...']}}]}}]}}, {'//two/...': {'children': ['u1//two/...', 'u2//two/...', {'//two/black/...': {'children': ['u1//two/black/...', 'u2//two/black/...']}}, {'//two/blue/...': {'children': ['u1//two/blue/...', 'u2//two/blue/...']}}]}}]}}
 
 
+    def test_typed_to_jstree_dict_user_path_alphabet_ordered(self):
+        for x in range(0, 500):
+            d = self.t.typed_to_jstree_dict()
+            assert d == {
+                            "string" : "//...",
+                            "id" : "//...",
+                            "children" : [{
+                                    "string" : "u1//...",
+                                    "id" : "u1//..."
+                                }, {
+                                    "string" : "u2//...",
+                                    "id" : "u2//..."
+                                }, {
+                                    "string" : "//one/...",
+                                    "id" : "//one/...",
+                                    "children" : [{
+                                            "string" : "u1//one/...",
+                                            "id" : "u1//one/..."
+                                        }, {
+                                            "string" : "u2//one/...",
+                                            "id" : "u2//one/..."
+                                        }, {
+                                            "string" : "//one/blue/...",
+                                            "id" : "//one/blue/...",
+                                            "children" : [{
+                                                    "string" : "u1//one/blue/...",
+                                                    "id" : "u1//one/blue/..."
+                                                }, {
+                                                    "string" : "u2//one/blue/...",
+                                                    "id" : "u2//one/blue/..."
+                                                }
+                                            ]
+                                        }, {
+                                            "string" : "//one/red/...",
+                                            "id" : "//one/red/...",
+                                            "children" : [{
+                                                    "string" : "u1//one/red/...",
+                                                    "id" : "u1//one/red/..."
+                                                }, {
+                                                    "string" : "u2//one/red/...",
+                                                    "id" : "u2//one/red/..."
+                                                }, {
+                                                    "string" : "//one/red/new/...",
+                                                    "id" : "//one/red/new/..."
+                                                }, {
+                                                    "string" : "//one/red/old/...",
+                                                    "id" : "//one/red/old/...",
+                                                    "children" : [{
+                                                            "string" : "u1//one/red/old/...",
+                                                            "id" : "u1//one/red/old/..."
+                                                        }, {
+                                                            "string" : "u2//one/red/old/...",
+                                                            "id" : "u2//one/red/old/..."
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }, {
+                                    "string" : "//two/...",
+                                    "id" : "//two/...",
+                                    "children" : [{
+                                            "string" : "u1//two/...",
+                                            "id" : "u1//two/..."
+                                        }, {
+                                            "string" : "u2//two/...",
+                                            "id" : "u2//two/..."
+                                        }, {
+                                            "string" : "//two/black/...",
+                                            "id" : "//two/black/...",
+                                            "children" : [{
+                                                    "string" : "u1//two/black/...",
+                                                    "id" : "u1//two/black/..."
+                                                }, {
+                                                    "string" : "u2//two/black/...",
+                                                    "id" : "u2//two/black/..."
+                                                }
+                                            ]
+                                        }, {
+                                            "string" : "//two/blue/...",
+                                            "id" : "//two/blue/...",
+                                            "children" : [{
+                                                    "string" : "u1//two/blue/...",
+                                                    "id" : "u1//two/blue/..."
+                                                }, {
+                                                    "string" : "u2//two/blue/...",
+                                                    "id" : "u2//two/blue/..."
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
 
 def suite():
     suites = [ToDictTreeCase] #[NodeCase, TreeCase, AccessTreeCase, TypedTreeCase, TypedPruningCase, StrTypedTreeCase, ToDictTreeCase, ToHtmlTreeCase]

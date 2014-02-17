@@ -1,6 +1,7 @@
 import json
 from node import Node
 from copy import deepcopy, copy
+from collections import OrderedDict
 
 __author__ = 'chenxm'
 
@@ -81,6 +82,21 @@ class Tree(object):
 
         return tree_str
 
+    def typed_to_jstree_dict(self, nid=None, key=None, reverse=False):
+        nid = self.root if (nid is None) else nid
+        tree_dict = OrderedDict([('string',str(self[nid].tag)), ('id',nid), ("children", [])])
+
+        if self[nid].expanded:
+            queue = self.order_nodes(nid, key=key, reverse=reverse)
+
+            for elem in queue:
+                tree_dict["children"].append(
+                    self.typed_to_jstree_dict(elem.identifier))
+            if tree_dict["children"] == []:
+                tree_dict.pop("children")  # Tidy up the dict; not sure it helps or is necessary
+
+            return tree_dict
+
     def typed_to_dict(self, nid=None, key=None, reverse=False):
         nid = self.root if (nid is None) else nid
         tree_dict = {str(self[nid].tag): {"children": []}}
@@ -93,6 +109,7 @@ class Tree(object):
                     self.typed_to_dict(elem.identifier))
             if tree_dict[str(self[nid].tag)]["children"] == []:
                 tree_dict = str(self[nid].tag)
+
             return tree_dict
 
     def to_dict(self, nid=None, key=None, reverse=False):
@@ -115,6 +132,9 @@ class Tree(object):
 
     def to_json(self):
         return json.dumps(self.to_dict())
+
+    def to_jstree_json(self):
+        return json.dumps(self.typed_to_jstree_dict(), sort_keys=False)
 
     def label(self, nid, show_access, idhidden):
         if (show_access and not self.typed) or (show_access and self.typed and self[nid].user and self[nid].access):
