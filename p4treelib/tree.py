@@ -82,10 +82,10 @@ class Tree(object):
 
         return tree_str
 
-    def typed_to_jstree_dict(self, nid=None, key=None, reverse=False, show_access=True):
+    def typed_to_jstree_dict(self, nid=None, key=None, reverse=False, show_access=True, expand_all=False):
         nid = self.root if (nid is None) else nid
         if self[nid].access and show_access:
-            tree_dict = OrderedDict([('text',"{0} {1}".format(str(self[nid].tag), str(self[nid].access))), ('id',nid), ("children", [])])
+            tree_dict = OrderedDict([('text',"{0} {1}".format(str(self[nid].tag), str(self[nid].access))), ('id',nid), ("children", []), ("state",{"opened":expand_all})])
         else:
             tree_dict = OrderedDict([('text',"{0}".format(str(self[nid].tag))), ('id',nid), ("children", [])])
 
@@ -94,13 +94,13 @@ class Tree(object):
 
             for elem in queue:
                 tree_dict["children"].append(
-                    self.typed_to_jstree_dict(elem.identifier, key=key, reverse=reverse, show_access=show_access))
+                    self.typed_to_jstree_dict(elem.identifier, key=key, reverse=reverse, show_access=show_access, expand_all=expand_all))
             if tree_dict["children"] == []:
                 tree_dict.pop("children")  # Tidy up the dict
 
             return tree_dict
 
-    def typed_to_dict(self, nid=None, key=None, reverse=False):
+    def typed_to_dict(self, nid=None, key=None, reverse=False, expand_all=False):
         nid = self.root if (nid is None) else nid
         tree_dict = {str(self[nid].tag): {"children": []}}
 
@@ -109,7 +109,7 @@ class Tree(object):
 
             for elem in queue:
                 tree_dict[str(self[nid].tag)]["children"].append(
-                    self.typed_to_dict(elem.identifier))
+                    self.typed_to_dict(elem.identifier, key=key, reverse=reverse, expand_all=expand_all))
             if tree_dict[str(self[nid].tag)]["children"] == []:
                 tree_dict = str(self[nid].tag)
 
@@ -136,8 +136,8 @@ class Tree(object):
     def to_json(self):
         return json.dumps(self.to_dict())
 
-    def to_jstree_json(self):
-        return json.dumps(self.typed_to_jstree_dict(), sort_keys=False)
+    def to_jstree_json(self, show_access=True, expand_all=False):
+        return json.dumps(self.typed_to_jstree_dict(show_access=show_access, expand_all=expand_all), sort_keys=False)
 
     def label(self, nid, show_access, idhidden):
         if (show_access and not self.typed) or (show_access and self.typed and self[nid].user and self[nid].access):
