@@ -82,12 +82,14 @@ class Tree(object):
 
         return tree_str
 
-    def typed_to_jstree_dict(self, nid=None, key=None, reverse=False, show_access=True, expand_all=False):
+    def typed_to_jstree_dict(self, nid=None, key=None, reverse=False, show_access=True, expand_all=False, expand_access=True):
         nid = self.root if (nid is None) else nid
         if self[nid].access and show_access:
-            tree_dict = OrderedDict([('text',"{0} {1}".format(str(self[nid].tag), str(self[nid].access))), ('id',nid), ("children", []), ("state",{"opened":expand_all})])
+            tree_dict = OrderedDict([('text',"{0} {1}".format(str(self[nid].tag), str(self[nid].access))),
+                ('id',nid), ("children", []), ("state",{"opened":expand_access})])
         else:
-            tree_dict = OrderedDict([('text',"{0}".format(str(self[nid].tag))), ('id',nid), ("children", [])])
+            tree_dict = OrderedDict([('text',"{0}".format(str(self[nid].tag))), ('id',nid),
+                ("children", []), ("state",{"opened":expand_all})])
 
         if self[nid].expanded:
             queue = self.order_nodes(nid, key=key, reverse=reverse)
@@ -136,8 +138,8 @@ class Tree(object):
     def to_json(self):
         return json.dumps(self.to_dict())
 
-    def to_jstree_json(self, show_access=True, expand_all=False):
-        return json.dumps(self.typed_to_jstree_dict(show_access=show_access, expand_all=expand_all), sort_keys=False)
+    def to_jstree_json(self, show_access=True, expand_all=False, expand_access=True):
+        return json.dumps(self.typed_to_jstree_dict(show_access=show_access, expand_all=expand_all, expand_access=expand_access), sort_keys=False)
 
     def label(self, nid, show_access, idhidden):
         if (show_access and not self.typed) or (show_access and self.typed and self[nid].user and self[nid].access):
